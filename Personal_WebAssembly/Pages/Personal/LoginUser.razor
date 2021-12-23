@@ -1,0 +1,65 @@
+﻿@page "/personal/login"
+
+@using Personal_WebAssembly.Models
+@using Personal_WebAssembly.Interfaces
+
+@inject IAuthenticationRepo _authRepo
+@inject NavigationManager _navManager
+@inject Blazored.Toast.Services.IToastService Toaster
+
+
+<h1>Login </h1>
+@if (!response)
+{
+<p>  Something went wrong </p>
+}
+<div>
+    <EditForm Model="Model" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <InputText Id="email" class="form-control" @bind-Value="Model.Username" />
+            <ValidationMessage For="@(() => Model.Username)" />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <InputText Id="password" type="password" class="form-control" @bind-Value="Model.Password" />
+            <ValidationMessage For="@(() => Model.Password)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Login </button>
+
+    </EditForm>
+</div>
+
+
+@code { 
+
+    private ModelLogin Model = new ModelLogin();
+    private bool response = true;
+    private async Task HandleLogin()
+    {
+        try
+        {
+            response = await _authRepo.Login(Model);
+            if (response)
+            {
+
+                Toaster.ShowInfo($"Logged IN", "Wellcome!");
+                _navManager.NavigateTo("/");
+            }
+            else
+            {
+                Toaster.ShowError("Error cant Connect DB", "");
+            }
+        }
+        catch
+        {
+            Toaster.ShowError("Error cant Connect DB","");
+        }
+
+
+    }
+
+    }

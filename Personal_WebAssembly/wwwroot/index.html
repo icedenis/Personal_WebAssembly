@@ -1,0 +1,74 @@
+
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Personal_WebAssembly</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <!--//custom css-->
+    <link href="css/site.css" rel="stylesheet" />
+
+    <link href="_content/ChartJs.Blazor/ChartJSBlazor.css" rel="stylesheet" />
+
+
+    <link href="_content/BlazorPro.Spinkit/spinkit.min.css" rel="stylesheet" />
+    <!--Blazored toast-->
+    <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+    <!--Link to PWA app-->
+    <link href="manifest.json" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+</head>
+
+<body>
+    <app>
+        <div class="modal-overlay">
+            <div>
+                <h3 class="text-muted">Loading PersonalDB ... </h3>
+                <br />
+            </div>
+            <div class="sk-wave">
+                <div class="sk-wave-rect"></div>
+                <div class="sk-wave-rect"></div>
+                <div class="sk-wave-rect"></div>
+                <div class="sk-wave-rect"></div>
+                <div class="sk-wave-rect"></div>
+            </div>
+        </div>
+    </app>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <!--PWA SCRIP-->
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+
+    <!-- Site.js custom JS file-->
+    <script src="site.js"></script>
+    <!-- Blazorstrap JS Files -->
+    <script src="_content/BlazorStrap/blazorStrap.js"></script>
+    <script src="_content/BlazorStrap/popper.min.js"></script>
+
+    <!-- ChartJS.Blazor Files -->
+    <script src="_content/ChartJs.Blazor/moment-with-locales.min.js" type="text/javascript" language="javascript"></script>
+    <script src="_content/ChartJs.Blazor/Chart.min.js" type="text/javascript" language="javascript"></script>
+    <script src="_content/ChartJs.Blazor/ChartJsBlazorInterop.js" type="text/javascript" language="javascript"></script>
+    <!--@*Blazor Input Fiel after .net 5.0 blazor has this commponnt build IN*@-->
+    <script src="_content/BlazorInputFile/inputfile.js"></script>
+    <!--blazorsieze-->
+    <script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
+
+</body>
+
+</html>

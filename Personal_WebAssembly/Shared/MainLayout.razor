@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+@using Blazored.Toast.Configuration
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="10"/>
+    <MediaQueryList>
+
+        <div>
+
+            <NavMenu />
+        </div>
+
+
+        <div class="main">
+
+
+
+            <div class="content px-4">
+                @Body
+            </div>
+        </div>
+
+    </MediaQueryList>
+
+
+    @*<footer class="footer">
+            <div class="container text-center">
+                <span class="text-muted">&copy; FH-Aachen.com 2021</span>
+            </div>
+        </footer>*@

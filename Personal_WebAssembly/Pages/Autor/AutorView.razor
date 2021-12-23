@@ -1,0 +1,269 @@
+﻿@page "/author"
+
+@inject IAuthoRepo _repo
+@*@inject IHochladen _imgRepo*@
+
+@inject HttpClient _client
+@inject Blazored.Toast.Services.IToastService Toaster
+
+
+
+@if (authorModels == null)
+{
+       <p><em>Loading...</em></p>
+    <br>
+    <Wave />
+}else if(isFailed == true){
+      
+    <BSAlert Color="Color.Danger">Something went wrong </BSAlert>
+
+ }
+else
+{
+<h3>AutorView</h3>
+
+<div class="row mb-3">
+    <div class="col-md-7">
+        <AuthorizeView>
+            <Authorized>
+                <p>
+                    <NavLink href="@($"/author/create")">
+                        <BSButton Class="btn btn-dark">Add Author</BSButton>
+
+                    </NavLink>
+                </p>
+            </Authorized>
+            <NotAuthorized>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+
+    <BSTable IsResponsive="true" class='table'>
+
+        <thead class="thead-light">
+            <tr>
+                <th>Name</th>
+                <th>Last Name</th>
+               
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in authorModels)
+            {
+                <tr>
+                    <td>@data.Firstname</td>
+                    <td>@data.Lastname</td>
+                    <td>
+                        <BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-eye text-primary" @onclick="@(async () => await ViewAuthor(data.Id))"></BSButton>
+                        <AuthorizeView>
+                            <Authorized>
+
+                                <NavLink href="@($"/author/edit/{data.Id}")">
+                                    <i class="oi oi-pencil text-warning"></i>
+                                </NavLink>
+                                <BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-trash text-danger" @onclick="@(async () => await DeleteAuthor(data.Id))"></BSButton>
+                                @*<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-trash text-danger" @onclick="@(async () => await DeleteOrganization(organization.Id))"></BSButton>*@
+                            </Authorized>
+                         </AuthorizeView>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+
+
+    </BSTable>
+
+
+    // View
+<div>
+
+
+    <BSModal @bind-IsOpen="isView" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+        <BSModalHeader @onclick="CloseModal">@modalTitle</BSModalHeader>
+        <BSModalBody>
+            <div class="col-md-12">
+                @if (isDelete)
+                {
+                    <BSAlert Color="Color.Danger">Please review carefully before deleting.</BSAlert>
+
+                }
+                <hr />
+                <h5>Author Data</h5>
+                <hr />
+                <BSTable IsResponsive="true" class="table">
+                    <tr>
+                        <td>Id</td>
+                        <td>@CurrentAuthor.Id</td>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td>@CurrentAuthor.Firstname</td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td>@CurrentAuthor.Lastname</td>
+                    </tr>
+                    <tr>
+                        <td>Commend</td>
+                        <td>@CurrentAuthor.Bio</td>
+                    </tr>
+                  
+                </BSTable>
+      @if (CurrentAuthor.Books == null || CurrentAuthor.Books.Count < 1)
+        {
+            <div class="alert alert-dismissible alert-secondary">
+                No Books for this Author
+            </div>
+        }
+        else
+        {
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    <h4>Author's Books</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var book in CurrentAuthor.Books)
+                    {
+                        <li class="list-group-item">@book.Title - @book.Price </li>
+                    }
+                </ul>
+            </div>
+        }
+
+
+            </div>
+            <div class="form-group">
+                @if (isDelete) 
+                {
+                     <button type="button" class="btn btn-danger" @onclick="(async () => await RemoveAuthor(CurrentAuthor.Id))">Delete</button>
+                    <button class="btn btn-primary" @onclick="CloseModal">Cancel</button>
+                }                
+               else { 
+                
+                   <button class="btn btn-primary" @onclick="CloseModal">Cancel</button>
+                }
+                
+            </div>
+        </BSModalBody>
+    </BSModal>
+
+</div>
+}
+
+
+
+
+
+
+@code {
+    private IList<AuthorModel> authorModels;
+
+    protected int CurrentAuthorID{get; set;}
+    protected bool isView { get; set; }
+    protected bool isAdd { get; set; }
+    protected bool isDelete { get; set; }
+    protected bool isFailed { get; set; }
+    protected string modalTitle { get; set; }
+    protected AuthorModel CurrentAuthor = new AuthorModel
+    {
+        Bio = "",
+        Lastname = "",
+        Firstname = "",
+        Books = null
+    };
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        await GetAllAuthor();
+
+    }
+
+    public async Task GetAllAuthor()
+    {
+        authorModels = await _repo.GetAll(Endpoint.AuthorEndpoint);
+
+        // tuka e drugiq variant kak da cllvam ot apito amaa ne moga da addna tokena kam nego
+        //try
+        //{
+        //    // or await _client.GetFromJsonAsync<IList<AuthorModel>>("localhost:Port/api/");
+        //    authorModels = await _client.GetFromJsonAsync<IList<AuthorModel>>(Endpoint.AuthorEndpoint);
+        //}
+        //catch
+        //{
+
+        //}
+
+    }
+
+
+    protected async Task ViewAuthor(int AuthorID)
+    {
+
+        this.isView = true;
+        this.modalTitle = "View Author";
+        CurrentAuthor = await _repo.Get(Endpoint.AuthorEndpoint, AuthorID);
+
+
+
+
+
+
+
+        CurrentAuthorID = CurrentAuthor.Id;
+    }
+
+    private async Task RemoveAuthor(int AuthorID)
+    {
+        bool isRemoved = await _repo.Delete(Endpoint.AuthorEndpoint, AuthorID);
+        if (isRemoved)
+        {
+            Toaster.ShowSuccess("Author Deleted", "OK");
+            CloseModal();
+            await OnParametersSetAsync();
+        }
+        else
+        {
+            isFailed = true;
+            Toaster.ShowError("Error Author was not Deleted", "Cant connect Database");
+        }
+    }
+    private async Task DeleteAuthor(int AuthorID)
+    {
+
+        isDelete = true;
+        this.isView = true;
+        this.modalTitle = "View Author";
+        CurrentAuthor = await _repo.Get(Endpoint.AuthorEndpoint, AuthorID);
+        CurrentAuthorID = CurrentAuthor.Id;
+
+
+    }
+
+
+    protected void CloseModal()
+    {
+        CurrentAuthor = new AuthorModel
+        {
+            Bio = "",
+            Lastname = "",
+            Firstname = "",
+            Books = null
+
+        };
+        CurrentAuthorID = 0;
+        this.isAdd = false;
+        this.isView = false;
+        this.isDelete = false;
+        this.isFailed = false;
+        StateHasChanged();
+    }
+
+
+
+}

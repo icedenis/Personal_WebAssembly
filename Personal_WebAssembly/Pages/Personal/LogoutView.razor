@@ -1,0 +1,32 @@
+﻿@page "/personal/logout"
+
+@using Personal_WebAssembly.Interfaces
+@inject IAuthenticationRepo _autho;
+@inject NavigationManager UriHelper;
+@inject Blazored.Toast.Services.IToastService Toaster
+
+
+
+
+
+
+
+@code {
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await _autho.Logout();
+            Toaster.ShowWarning($"Logged OUT", "");
+            UriHelper.NavigateTo("/personal/login");
+        }
+        catch
+        {
+            Toaster.ShowError("Something went Wrong", "");
+        }
+
+    }
+
+}

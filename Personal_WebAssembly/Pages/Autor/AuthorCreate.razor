@@ -1,0 +1,103 @@
+﻿@page "/author/create"
+
+
+@inject IAuthoRepo _repo
+@inject NavigationManager UriHelper
+
+@inject Blazored.Toast.Services.IToastService Toaster
+
+<h3>Create new Author</h3>
+
+@if (isFailed == true)
+{
+<BSAlert Color="Color.Danger">Something went wrong </BSAlert>
+}
+
+else {
+<EditForm Model="CurrentAuthor" OnValidSubmit="@CreateAuthor">
+    <DataAnnotationsValidator />
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            <label class="control-label">First Name</label>
+            <InputText @bind-Value="CurrentAuthor.Firstname" class="form-control" id="firstname" />
+        </div>
+        <div class="form-group col-md-2">
+            <label class="control-label">Last Name</label>
+            <InputText @bind-Value="CurrentAuthor.Lastname" class="form-control" id="lastname" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="bio">Biography</label>
+        <InputTextArea @bind-Value="CurrentAuthor.Bio" class="form-control" id="bio" />
+    </div>
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <button type="submit" class="btn btn-success">Save</button>
+            <button @onclick="BackTo" class="btn btn-outline-secondary">
+                <span class="oi oi-media-skip-backward"></span>
+                Back
+            </button>
+        </div>
+    </div>
+</EditForm>
+
+
+
+}
+
+@code {
+
+    protected int CurrentAuthorID { get; set; }
+    protected bool isEdit { get; set; }
+    protected bool isFailed { get; set; }
+    protected string modalTitle { get; set; }
+    private bool isSuccess = true;
+    protected AuthorModel CurrentAuthor = new AuthorModel
+    {
+        Bio = "",
+        Lastname = "",
+        Firstname = "",
+        Books = null
+    };
+
+
+    protected async Task CreateAuthor()
+    {
+
+        isSuccess = await _repo.Create(Endpoint.AuthorEndpoint, CurrentAuthor);
+
+        if (isSuccess)
+        {
+            //_toastService.ShowWarning("Author Updated Successfully", "");
+            Toaster.ShowSuccess("New Authore Created", "OK");
+            BackTo();
+        }
+        else
+        {
+            isFailed = true;
+        }
+
+    }
+
+    private void BackTo()
+    {
+        UriHelper.NavigateTo("/author");
+    }
+
+    protected void CloseModal()
+    {
+        CurrentAuthor = new AuthorModel
+        {
+            Bio = "",
+            Lastname = "",
+            Firstname = "",
+            Books = null
+
+        };
+        CurrentAuthorID = 0;
+        this.isFailed = false;
+        StateHasChanged();
+    }
+
+}
